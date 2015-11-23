@@ -6,6 +6,8 @@ var spawn = require('child_process').spawn;
 var temp = require('temp');
 require('bufferjs/indexOf');
 
+var PDFTK_BIN = process.env.PDFTK_LOCATION | "pdftk";
+
 // take stdin, write to random access file
 // strip cropbox
 // then reapply cropbox and write to stdout
@@ -16,7 +18,7 @@ function debug () {
 }
 
 function repairPDF (outs) {
-	var pdftk = spawn('pdftk', ['-', 'output', '-']);
+	var pdftk = spawn(PDFTK_BIN, ['-', 'output', '-']);
 	pdftk.stderr.on('data', function (data) {
 	  debug('pdftk encountered an error:\n', String(data));
 	});
