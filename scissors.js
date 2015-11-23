@@ -6,6 +6,7 @@ var Stream = require('stream').Stream;
 var BufferStream = require('bufferstream');
 var temp = require('temp');
 var async = require('async');
+var PDFTK_BIN = process.env.PDFTK_LOCATION || "pdftk";
 
 // Calls functions once a promise has been delivered.
 // Queue functions by using promise(yourCallback); Deliver the promise using promise.deliver().
@@ -81,7 +82,7 @@ Command.prototype._input = function () {
 Command.prototype.range = function (min, max) {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN , cmd._input(),
     'cat', min + (max === null ? '' : '-' + max),
     'output', '-'
     ]);
@@ -91,7 +92,7 @@ Command.prototype.pages = function () {
   var args = Array.prototype.slice.call(arguments);
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN , cmd._input(),
     'cat'].concat(args.map(Number), [
       'output', '-'
       ]));
@@ -100,7 +101,7 @@ Command.prototype.pages = function () {
 Command.prototype.odd = function (min, max) {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN, cmd._input(),
     'cat', 'odd',
     'output', '-'
     ]);
@@ -109,7 +110,7 @@ Command.prototype.odd = function (min, max) {
 Command.prototype.even = function (min, max) {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN, cmd._input(),
     'cat', 'even',
     'output', '-'
     ]);
@@ -118,7 +119,7 @@ Command.prototype.even = function (min, max) {
 Command.prototype.reverse = function (min, max) {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN, cmd._input(),
     'cat', 'end-1',
     'output', '-'
     ]);
@@ -135,7 +136,7 @@ Command.prototype.rotate = function (amount) {
     default: return this;
   }
   return cmd._push([
-    'pdftk', cmd._input(),
+    PDFTK_BIN, cmd._input(),
     'cat', '1-end' + dir,
     'output', '-'
     ]);
@@ -144,7 +145,7 @@ Command.prototype.rotate = function (amount) {
 Command.prototype.compress = function () {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(), 'output', '-',
+    PDFTK_BIN, cmd._input(), 'output', '-',
     'compress'
     ]);
 };
@@ -152,7 +153,7 @@ Command.prototype.compress = function () {
 Command.prototype.uncompress = function () {
   var cmd = this._copy();
   return cmd._push([
-    'pdftk', cmd._input(), 'output', '-',
+    PDFTK_BIN, cmd._input(), 'output', '-',
     'uncompress'
     ]);
 };
@@ -162,7 +163,7 @@ Command.prototype.repair = function () {
   // "repairing" using pdftk fixes this.
   var cmd = this._copy();
   var args = [
-    'pdftk', this._input(), 'output', '-',
+    PDFTK_BIN, this._input(), 'output', '-',
     ];
   // Don't double-repair.
   if (JSON.stringify(this.commands[this.commands.length - 1]) != JSON.stringify(args)) {
@@ -384,7 +385,7 @@ scissors.join = function () {
         next(null, file);
       });
   }, function (err, files) {
-    command = ['pdftk'].concat(files, ['output', outfile]);
+    command = [PDFTK_BIN].concat(files, ['output', outfile]);
     var prog = spawn(command[0], command.slice(1));
     console.error('spawn:', command.join(' '));
     prog.stderr.on('data', function (data) {
