@@ -6,7 +6,7 @@ var spawn = require('child_process').spawn;
 var temp = require('temp');
 require('bufferjs/indexOf');
 
-var PDFTK_BIN = process.env.PDFTK_LOCATION | "pdftk";
+var PDFTK_BIN = process.env.PDFTK_LOCATION || "pdftk";
 
 // take stdin, write to random access file
 // strip cropbox
